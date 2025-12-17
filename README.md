@@ -68,7 +68,7 @@ Tudo isso acontece **diretamente no navegador**, sem necessidade de instalar nad
 ## 🚀 Como Usar
 
 1. Baixe ou clone este repositório
-2. Abra o arquivo `index.html` em qualquer navegador moderno
+2. Abra o arquivo `index.html` em qualquer navegador
 3. Clique em **Adicionar arquivo**
 4. Selecione sua planilha de entregas
 5. Baixe o arquivo organizado gerado pelo sistema
@@ -77,16 +77,8 @@ Tudo isso acontece **diretamente no navegador**, sem necessidade de instalar nad
 
 ## 🌐 Publicação Online (GitHub Pages)
 
-Este projeto pode ser publicado facilmente usando **GitHub Pages**:
-
-1. Vá em **Settings** do repositório
-2. Acesse **Pages**
-3. Em *Source*, selecione:
-   - Branch: `main`
-   - Pasta: `/root`
-4. Salve
-
-O GitHub fornecerá um link público para acesso ao sistema.
+Este projeto também pode ser acessado através do link
+https://fabiobrso.github.io/melhor-rota
 
 ---
 
