@@ -704,26 +704,29 @@ function switchPage(pageName) {
   document.getElementById(pageName).classList.add('active');
 }
 
-/* ================= NORMALIZAÇÃO ================= */
+/* 🔤 REGRAS DE DESABREVIAÇÃO (APENAS 2 PRIMEIRAS PALAVRAS) */
 
-const NORMALIZATION_RULES = [
-  { regex: /\bALAMEDA\b|\bAL\b\.?/gi, replace: "Alameda" },
-  { regex: /\bAVENIDA\b|\bAV\b\.?/gi, replace: "Avenida" },
-  { regex: /\bRUA\b|\bR\b\.?/gi, replace: "Rua" },
-  { regex: /\bRODOVIA\b|\bROD\b\.?/gi, replace: "Rodovia" },
-  { regex: /\bTRAVESSA\b|\bTRAV\b\.?/gi, replace: "Travessa" },
-  { regex: /\bTRAVESSA\b|\bTV\b\.?/gi, replace: "Travessa" },
-  { regex: /\bPRACA\b|\bPÇA\b\.?/gi, replace: "Praça" },
-  { regex: /\bESTRADA\b|\bEST\b\.?/gi, replace: "Estrada" },
-  { regex: /\bVILA\b|\bVL\b\.?/gi, replace: "Vila" },
-  { regex: /\bBRIGADEIRO\b|\bBRG\b\.?/gi, replace: "Brigadeiro" },
-  { regex: /\bVISCONDE\b|\bVSC\b\.?/gi, replace: "Visconde" },
-  { regex: /\bCORONEL\b|\bCEL\b\.?/gi, replace: "Coronel" },
-  { regex: /\bSANTA\b|\bSTA\b\.?/gi, replace: "Santa" },
-  { regex: /\bALMIRANTE\b|\bALM\b\.?/gi, replace: "Almirante" },
-  { regex: /\bMAJOR\b|\bMAJ\b\.?/gi, replace: "Major" },
-  { regex: /\bCAPITAO\b|\bCEL\b\.?/gi, replace: "Capitão" },
-  { regex: /\bSOLDADO\b|\bSD\b\.?/gi, replace: "Soldado" }
+const NORMALIZATION_RULES=[
+ {regex:/^R\.?$/i,replace:"Rua"},
+ {regex:/^AV\.?$/i,replace:"Avenida"},
+ {regex:/^AL\.?$/i,replace:"Alameda"},
+ {regex:/^DR\.?$/i,replace:"Doutor"},
+ {regex:/^CEL\.?$/i,replace:"Coronel"},
+ {regex:/^STO\.?$/i,replace:"Santo"},
+ {regex:/^STA\.?$/i,replace:"Santa"},
+ {regex:/^ROD\.?$/i,replace:"Rodovia"},
+ {regex:/^BRG\.?$/i,replace:"Brigadeiro"},
+ {regex:/^ALM\.?$/i,replace:"Almirante"},
+ {regex:/^MAJ\.?$/i,replace:"Major"},
+ {regex:/^CAP\.?$/i,replace:"Capitão"}, 
+ {regex:/^SD\.?$/i,replace:"Soldado"}, 
+ {regex:/^PE\.?$/i,replace:"Padre"}, 
+ {regex:/^TRAV\.?$/i,replace:"Travessa"}, 
+ {regex:/^TV\.?$/i,replace:"Travessa"},
+ {regex:/^PC\.?$/i,replace:"Praça"},
+ {regex:/^EST\.?$/i,replace:"Estrada"},
+ {regex:/^VL\.?$/i,replace:"Vila"},
+ {regex:/^VSC\.?$/i,replace:"Visconde"}
 ];
 
 function normalizeText(text) {
@@ -733,13 +736,35 @@ function normalizeText(text) {
 }
 
 function normalizeAddress(address) {
-  let txt = address.toUpperCase();
-  NORMALIZATION_RULES.forEach(r => txt = txt.replace(r.regex, r.replace.toUpperCase()));
-  txt = txt.replace(/([A-ZÀ-Ü ]+)\s+(\d+)/g, "$1, $2")
-           .replace(/\s*,\s*/g, ", ")
-           .replace(/\s+/g, " ")
-           .trim();
-  return txt.toLowerCase().replace(/(^|\s)\S/g, l => l.toUpperCase());
+  if (!address) return "";
+
+  // separa logradouro do restante (número/complemento)
+  const parts = address.split(",");
+  const streetRaw = parts[0].trim();
+  const rest = parts.slice(1).join(",").trim();
+
+  // quebra o logradouro em palavras
+  const words = streetRaw.split(/\s+/);
+
+  // normaliza APENAS as duas primeiras palavras
+  const normalizedWords = words.map((word, index) => {
+    if (index > 1) return word; // só 0 e 1
+
+    for (const rule of NORMALIZATION_RULES) {
+      if (rule.regex.test(word)) {
+        return rule.replace;
+      }
+    }
+    return word;
+  });
+
+  let result = normalizedWords.join(" ").replace(/\s+/g, " ").trim();
+
+  if (rest) result += ", " + rest;
+
+  return result
+    .toLowerCase()
+    .replace(/(^|\s)\S/g, l => l.toUpperCase());
 }
 
 function extractAddressParts(address) {
