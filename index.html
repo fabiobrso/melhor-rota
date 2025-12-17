@@ -391,6 +391,10 @@ const NORMALIZATION_RULES = [
   { regex: /\bBRIGADEIRO\b|\bBRG\b\.?/gi, replace: "Brigadeiro" },
   { regex: /\bVISCONDE\b|\bVSC\b\.?/gi, replace: "Visconde" },
   { regex: /\bCORONEL\b|\bCEL\b\.?/gi, replace: "Coronel" },
+  { regex: /\bSANTA\b|\bSTA\b\.?/gi, replace: "Santa" },
+  { regex: /\bALMIRANTE\b|\bALM\b\.?/gi, replace: "Almirante" },
+  { regex: /\bMAJOR\b|\bMAJ\b\.?/gi, replace: "Major" },
+  { regex: /\bCAPITAO\b|\bCEL\b\.?/gi, replace: "Capitão" },
   { regex: /\bSOLDADO\b|\bSD\b\.?/gi, replace: "Soldado" }
 ];
 
@@ -465,7 +469,6 @@ function handleFile(event) {
       const key = [
         normalizeText(street),
         number,
-        normalizeText(bairro),
         normalizeText(city),
         zip
       ].join("|");
