@@ -41,10 +41,131 @@ body {
   color: var(--text-primary);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   min-height: 100vh;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 📊 BARRA SUPERIOR DE NAVEGAÇÃO */
+.navbar {
+  background: var(--bg-secondary);
+  box-shadow: var(--shadow-sm);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+}
+
+.navbar-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 64px;
+  gap: 8px;
+}
+
+/* 🖼️ LOGO NA NAVBAR */
+.logo-nav {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.1));
+  transition: transform 0.3s ease;
+}
+
+.logo-nav:hover {
+  transform: scale(1.05);
+}
+
+.nav-tabs-wrapper {
+  display: flex;
+  gap: 8px;
+}
+
+.nav-tab {
+  padding: 12px 28px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.nav-tab:hover {
+  background: rgba(0, 168, 232, 0.08);
+  color: var(--accent-blue);
+}
+
+.nav-tab.active {
+  background: var(--gradient-accent);
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 168, 232, 0.25);
+}
+
+.nav-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40%;
+  height: 3px;
+  background: white;
+  border-radius: 3px 3px 0 0;
+}
+
+/* 🖼️ LOGO NA NAVBAR */
+.logo-nav {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.1));
+  transition: transform 0.3s ease;
+}
+
+.logo-nav:hover {
+  transform: scale(1.05);
+}
+
+.nav-tabs-wrapper {
+  display: flex;
+  gap: 8px;
+}
+
+/* Remove o container fixo de logo */
+.logo-container-fixed {
+  display: none;
+}
+
+/* Remove o antigo container de logo */
+.logo-container {
+  display: none;
+}
+
+/* 📄 CONTEÚDO DAS PÁGINAS */
+.page-content {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
+  padding: 40px 20px;
+  flex: 1;
+}
+
+.page {
+  display: none;
+}
+
+.page.active {
+  display: block;
+  animation: fadeIn 0.4s ease;
 }
 
 .container {
@@ -244,16 +365,139 @@ input[type="file"] {
 /* 👨‍💻 CRÉDITOS */
 .credits {
   text-align: center;
-  margin-top: 24px;
+  padding: 20px;
   font-size: 13px;
   color: var(--text-secondary);
   opacity: 0.8;
+  background: var(--bg-primary);
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* 🆕 PÁGINA PNR */
+.pnr-form {
+  margin-top: 32px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid var(--accent-light);
+  border-radius: 12px;
+  font-size: 15px;
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(0, 168, 232, 0.1);
+}
+
+.form-input::placeholder {
+  color: #adb5bd;
+}
+
+.pnr-result {
+  margin-top: 32px;
+  padding: 24px;
+  background: linear-gradient(145deg, #f8f9fa 0%, #ffffff 100%);
+  border: 2px solid var(--accent-light);
+  border-radius: 16px;
+  display: none;
+  animation: fadeIn 0.4s ease;
+}
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  gap: 12px;
+}
+
+.result-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--accent-blue);
+}
+
+.copy-btn {
+  padding: 8px 16px;
+  background: var(--gradient-accent);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 8px rgba(0, 168, 232, 0.2);
+  width: auto;
+}
+
+.copy-btn .icon {
+  font-size: 16px;
+}
+
+.copy-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 168, 232, 0.3);
+}
+
+.copy-btn:active {
+  transform: translateY(0);
+}
+
+.result-text {
+  text-align: left;
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+  background: white;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 /* 📱 RESPONSIVE */
 @media (max-width: 640px) {
-  body {
-    padding: 16px;
+  .page-content {
+    padding: 24px 16px;
+  }
+
+  .navbar-container {
+    height: 56px;
+    padding: 0 16px;
+  }
+
+  .logo-nav {
+    width: 42px;
+    height: 42px;
+  }
+
+  .nav-tab {
+    padding: 10px 20px;
+    font-size: 14px;
   }
 
   .card {
@@ -295,6 +539,11 @@ input[type="file"] {
   .logo {
     width: 120px;
   }
+
+  .nav-tab {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
 }
 
 /* 🎨 ANIMATIONS */
@@ -308,73 +557,152 @@ input[type="file"] {
     transform: translateY(0);
   }
 }
-
-.card {
-  animation: fadeIn 0.6s ease;
-}
 </style>
 </head>
 
 <body>
 
-<div class="container">
-  <div class="card">
-
-    <!-- 🖼️ LOGO -->
-    <div class="logo-container">
-      <img src="logo.png" alt="Melhor Rota" class="logo">
+<!-- 📊 BARRA SUPERIOR DE NAVEGAÇÃO -->
+<nav class="navbar">
+  <div class="navbar-container">
+    <img src="logo.png" alt="Melhor Rota" class="logo-nav">
+    <div class="nav-tabs-wrapper">
+      <button class="nav-tab active" onclick="switchPage('otimizador')">Otimizador</button>
+      <button class="nav-tab" onclick="switchPage('pnr')">PNR</button>
     </div>
+  </div>
+</nav>
 
-    <!-- 📝 HEADER -->
-    <div class="header">
-      <h1>Organize sua Planilha para o Circuit</h1>
-      <div class="subtitle">
-        Adicione seu arquivo Shopee para organizar e agrupar os endereços automaticamente.
+<!-- 📄 CONTEÚDO DAS PÁGINAS -->
+<div class="page-content">
+  
+  <!-- PÁGINA: OTIMIZADOR -->
+  <div id="otimizador" class="page active">
+    <div class="container">
+      <div class="card">
+
+        <!-- 📝 HEADER -->
+        <div class="header">
+          <h1>Organize sua Planilha para o Circuit</h1>
+          <div class="subtitle">
+            Adicione seu arquivo Shopee para organizar e agrupar os endereços automaticamente.
+          </div>
+        </div>
+
+        <input type="file" id="fileInput" accept=".xlsx">
+
+        <!-- 🔘 BUTTONS -->
+        <div class="button-group">
+          <button class="upload" onclick="document.getElementById('fileInput').click()">
+            <span class="icon">📁</span>
+            <span>Adicionar arquivo</span>
+          </button>
+
+          <button class="download" id="downloadBtn" onclick="downloadFile()">
+            <span class="icon">⬇️</span>
+            <span>Baixar arquivo pronto</span>
+          </button>
+        </div>
+
+        <!-- ⏳ LOADING -->
+        <div class="loading" id="loading">
+          <div class="loading-bar" id="loadingBar"></div>
+        </div>
+
+        <!-- ✅ INFO -->
+        <div class="info" id="info"></div>
+
+        <!-- 🧾 FOOTER -->
+        <div class="footer">
+          Processamento rápido e seguro<br>
+          Seus dados não são armazenados
+        </div>
+
       </div>
     </div>
-
-    <input type="file" id="fileInput" accept=".xlsx">
-
-    <!-- 🔘 BUTTONS -->
-    <div class="button-group">
-      <button class="upload" onclick="document.getElementById('fileInput').click()">
-        <span class="icon">📁</span>
-        <span>Adicionar arquivo</span>
-      </button>
-
-      <button class="download" id="downloadBtn" onclick="downloadFile()">
-        <span class="icon">⬇️</span>
-        <span>Baixar arquivo pronto</span>
-      </button>
-    </div>
-
-    <!-- ⏳ LOADING -->
-    <div class="loading" id="loading">
-      <div class="loading-bar" id="loadingBar"></div>
-    </div>
-
-    <!-- ✅ INFO -->
-    <div class="info" id="info"></div>
-
-    <!-- 🧾 FOOTER -->
-    <div class="footer">
-      Processamento rápido e seguro<br>
-      Seus dados não são armazenados
-    </div>
-
   </div>
 
-  <!-- 👨‍💻 CRÉDITOS -->
-  <div class="credits">
-    Desenvolvido por <strong>Fábio Barros</strong>
+  <!-- PÁGINA: PNR -->
+  <div id="pnr" class="page">
+    <div class="container">
+      <div class="card">
+        
+        <!-- 📝 HEADER PNR -->
+        <div class="header">
+          <h1>Gerar texto para PNR</h1>
+          <div class="subtitle">
+            Preencha com seu <strong>nome completo</strong> e o <strong>código BR</strong>, depois clique em Gerar texto. Seu texto será criado em segundos.
+          </div>
+        </div>
+
+        <!-- 📋 FORMULÁRIO PNR -->
+        <div class="pnr-form">
+          <div class="form-group">
+            <label class="form-label">Seu nome</label>
+            <input type="text" id="nomeInput" class="form-input" placeholder="Ex: João Paulo">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Código BR</label>
+            <input type="text" id="codigoInput" class="form-input" placeholder="Ex: BR123456789123Z">
+          </div>
+
+          <button class="upload" onclick="gerarTextoPNR()">
+            <span class="icon">✨</span>
+            <span>Gerar texto</span>
+          </button>
+        </div>
+
+        <!-- 📄 RESULTADO -->
+        <div class="pnr-result" id="pnrResult">
+          <div class="result-header">
+            <span class="result-title">Seu texto está pronto!</span>
+            <button class="copy-btn" onclick="copiarTexto()">
+              <span class="icon">📋</span>
+              <span>Copiar</span>
+            </button>
+          </div>
+          <div class="result-text" id="resultText"></div>
+        </div>
+
+        <!-- ✅ INFO PNR -->
+        <div class="info" id="infoPNR"></div>
+
+      </div>
+    </div>
   </div>
+
 </div>
+
+<!-- 👨‍💻 CRÉDITOS FIXOS -->
+<footer class="credits">
+  Melhor Rota © 2025 • Desenvolvido por <strong>Fábio Barros</strong>
+</footer>
 
 <script>
 let outputWorkbook = null;
 let originalFileName = "arquivo.xlsx";
 
 document.getElementById("fileInput").addEventListener("change", handleFile);
+
+/* ================= NAVEGAÇÃO ENTRE PÁGINAS ================= */
+function switchPage(pageName) {
+  // Remove active de todas as abas
+  document.querySelectorAll('.nav-tab').forEach(tab => {
+    tab.classList.remove('active');
+  });
+
+  // Remove active de todas as páginas
+  document.querySelectorAll('.page').forEach(page => {
+    page.classList.remove('active');
+  });
+
+  // Adiciona active na aba clicada
+  event.target.classList.add('active');
+
+  // Adiciona active na página correspondente
+  document.getElementById(pageName).classList.add('active');
+}
 
 /* ================= NORMALIZAÇÃO ================= */
 
@@ -516,6 +844,66 @@ function handleFile(event) {
 
 function downloadFile() {
   XLSX.writeFile(outputWorkbook, `MelhorRota_${originalFileName}`);
+}
+
+/* ================= FUNÇÕES PNR ================= */
+
+function gerarTextoPNR() {
+  const nome = document.getElementById('nomeInput').value.trim();
+  const codigo = document.getElementById('codigoInput').value.trim();
+  const resultado = document.getElementById('pnrResult');
+  const textoResultado = document.getElementById('resultText');
+  const infoPNR = document.getElementById('infoPNR');
+
+  // Validação
+  if (!nome || !codigo) {
+    infoPNR.innerText = '⚠️ Por favor, preencha todos os campos!';
+    infoPNR.style.display = 'block';
+    infoPNR.classList.add('show');
+    infoPNR.style.background = 'linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 152, 0, 0.1) 100%)';
+    infoPNR.style.borderColor = 'rgba(255, 193, 7, 0.3)';
+    infoPNR.style.color = '#f57c00';
+    setTimeout(() => infoPNR.classList.remove('show'), 3000);
+    return;
+  }
+
+  // Gerar texto
+  const texto = `Olá!
+Me chamo ${nome}, sou entregador da Shopee
+Gostaria de confirmar se a entrega do seu pedido ${codigo} ocorreu como esperado
+Você poderia confirmar se o pacote foi realmente recebido, por favor?
+
+Envie 1: Se já recebeu o seu pedido
+Envie 2: Se recebeu com alguma divergência e qual seria?
+Envie 3: Não recebido
+
+Obrigado pela resposta.`;
+
+  textoResultado.textContent = texto;
+  resultado.style.display = 'block';
+
+  // Mensagem de sucesso
+  infoPNR.innerText = 'Texto gerado com sucesso!';
+  infoPNR.style.display = 'block';
+  infoPNR.classList.add('show');
+  infoPNR.style.background = 'linear-gradient(135deg, rgba(0, 168, 232, 0.1) 0%, rgba(0, 136, 194, 0.1) 100%)';
+  infoPNR.style.borderColor = 'rgba(0, 168, 232, 0.3)';
+  infoPNR.style.color = '#0077b6';
+  setTimeout(() => infoPNR.classList.remove('show'), 2000);
+}
+
+function copiarTexto() {
+  const texto = document.getElementById('resultText').textContent;
+  navigator.clipboard.writeText(texto).then(() => {
+    const infoPNR = document.getElementById('infoPNR');
+    infoPNR.innerText = 'Texto copiado para a área de transferência!';
+    infoPNR.style.display = 'block';
+    infoPNR.classList.add('show');
+    infoPNR.style.background = 'linear-gradient(135deg, rgba(0, 168, 232, 0.1) 0%, rgba(0, 136, 194, 0.1) 100%)';
+    infoPNR.style.borderColor = 'rgba(0, 168, 232, 0.3)';
+    infoPNR.style.color = '#0077b6';
+    setTimeout(() => infoPNR.classList.remove('show'), 2000);
+  });
 }
 </script>
 
