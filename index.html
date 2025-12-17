@@ -376,7 +376,7 @@ let originalFileName = "arquivo.xlsx";
 
 document.getElementById("fileInput").addEventListener("change", handleFile);
 
-/* ================= LÓGICA FUNCIONAL (INALTERADA) ================= */
+/* ================= NORMALIZAÇÃO ================= */
 
 const NORMALIZATION_RULES = [
   { regex: /\bALAMEDA\b|\bAL\b\.?/gi, replace: "Alameda" },
@@ -396,15 +396,17 @@ const NORMALIZATION_RULES = [
 
 function normalizeText(text) {
   return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-    .toUpperCase().replace(/\b(DE|DA|DO|DAS|DOS)\b/g, "")
-    .replace(/[^A-Z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
+    .toUpperCase().replace(/[^A-Z0-9 ]/g, " ")
+    .replace(/\s+/g, " ").trim();
 }
 
 function normalizeAddress(address) {
   let txt = address.toUpperCase();
   NORMALIZATION_RULES.forEach(r => txt = txt.replace(r.regex, r.replace.toUpperCase()));
   txt = txt.replace(/([A-ZÀ-Ü ]+)\s+(\d+)/g, "$1, $2")
-           .replace(/\s*,\s*/g, ", ").replace(/\s+/g, " ").trim();
+           .replace(/\s*,\s*/g, ", ")
+           .replace(/\s+/g, " ")
+           .trim();
   return txt.toLowerCase().replace(/(^|\s)\S/g, l => l.toUpperCase());
 }
 
@@ -413,7 +415,7 @@ function extractAddressParts(address) {
   return {
     street: m ? m[1] : address,
     number: m ? m[2] : "",
-    complement: m && m[3] ? m[3] : ""
+    complement: m && m[3] ? m[3].replace(/^,?\s*/g, "") : ""
   };
 }
 
@@ -422,7 +424,7 @@ function normalizeCEP(cep) {
   return d && d.length === 8 ? `${d.slice(0,5)}-${d.slice(5)}` : cep || "";
 }
 
-/* ================= PROCESSAMENTO + LOADING ================= */
+/* ================= PROCESSAMENTO ================= */
 
 function handleFile(event) {
   const file = event.target.files[0];
@@ -434,14 +436,11 @@ function handleFile(event) {
   const downloadBtn = document.getElementById("downloadBtn");
 
   loading.style.display = "block";
-  loadingBar.style.transition = "none";
   loadingBar.style.width = "0%";
   info.classList.remove("show");
   downloadBtn.style.display = "none";
 
   loadingBar.offsetWidth;
-
-  loadingBar.style.transition = "width 1s linear";
   loadingBar.style.width = "100%";
 
   const reader = new FileReader();
@@ -453,28 +452,46 @@ function handleFile(event) {
     const rows = XLSX.utils.sheet_to_json(sheet);
 
     const grouped = {};
+
     rows.forEach(r => {
-      const addr = normalizeAddress(r["Destination Address"] || "");
-      const { street, number, complement } = extractAddressParts(addr);
+      const full = normalizeAddress(r["Destination Address"] || "");
+      const { street, number, complement } = extractAddressParts(full);
+
+      const bairro = (r["Bairro"] || "").toString().trim();
+      const city = (r["City"] || "").toString().trim();
+      const zip = normalizeCEP(r["Zipcode/Postal code"] || "");
+      const sequence = r["Sequence"];
+
       const key = [
         normalizeText(street),
         number,
-        normalizeCEP(r["Zipcode/Postal code"] || "")
+        normalizeText(bairro),
+        normalizeText(city),
+        zip
       ].join("|");
 
       grouped[key] ??= {
         addr: number ? `${street}, ${number}` : street,
         comp: complement,
+        bairro,
+        city,
         seq: new Set()
       };
 
-      if (r.Sequence) grouped[key].seq.add(r.Sequence);
+      if (sequence !== undefined && sequence !== null) {
+        grouped[key].seq.add(sequence);
+      }
     });
 
     const out = Object.values(grouped).map(g => ({
       "Address Line 1": g.addr,
       "Address Line 2": g.comp,
-      "Pacotes Na Parada": [...g.seq].join(", ")
+      "Bairro": g.bairro,
+      "City": g.city,
+      "Pacotes Na Parada":
+        g.seq.size >= 5
+          ? `${[...g.seq].sort((a,b)=>a-b).join(", ")}; Total: ${g.seq.size} pacotes`
+          : [...g.seq].sort((a,b)=>a-b).join(", ")
     }));
 
     const ws = XLSX.utils.json_to_sheet(out);
@@ -483,12 +500,12 @@ function handleFile(event) {
 
     setTimeout(() => {
       loading.style.display = "none";
-      downloadBtn.style.display = "flex";
+      downloadBtn.style.display = "block";
       info.innerText = `Planilha organizada! (${out.length} paradas)`;
       info.style.display = "block";
       info.classList.add("show");
-      setTimeout(() => info.classList.remove("show"), 3000);
-    }, 1500);
+      setTimeout(() => info.classList.remove("show"), 2000);
+    }, 1000);
   };
 
   reader.readAsArrayBuffer(file);
@@ -498,5 +515,6 @@ function downloadFile() {
   XLSX.writeFile(outputWorkbook, `MelhorRota_${originalFileName}`);
 }
 </script>
+
 </body>
 </html>
