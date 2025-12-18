@@ -926,6 +926,66 @@ function handleFile(event) {
 function downloadFile() {
   XLSX.writeFile(outputWorkbook, `MelhorRota_${originalFileName}`);
 }
+
+/* ================= FUNÇÕES PNR ================= */
+
+function gerarTextoPNR() {
+  const nome = document.getElementById('nomeInput').value.trim();
+  const codigo = document.getElementById('codigoInput').value.trim();
+  const resultado = document.getElementById('pnrResult');
+  const textoResultado = document.getElementById('resultText');
+  const infoPNR = document.getElementById('infoPNR');
+
+  // Validação
+  if (!nome || !codigo) {
+    infoPNR.innerText = '⚠️ Por favor, preencha todos os campos!';
+    infoPNR.style.display = 'block';
+    infoPNR.classList.add('show');
+    infoPNR.style.background = 'linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 152, 0, 0.1) 100%)';
+    infoPNR.style.borderColor = 'rgba(255, 193, 7, 0.3)';
+    infoPNR.style.color = '#f57c00';
+    setTimeout(() => infoPNR.classList.remove('show'), 3000);
+    return;
+  }
+
+  // Gerar texto
+  const texto = `Olá!
+Me chamo ${nome}, sou entregador da Shopee
+Gostaria de confirmar se a entrega do seu pedido ${codigo} ocorreu como esperado
+Você poderia confirmar se o pacote foi realmente recebido, por favor?
+
+Envie 1: Se já recebeu o seu pedido
+Envie 2: Se recebeu com alguma divergência e qual seria?
+Envie 3: Não recebido
+
+Obrigado pela resposta.`;
+
+  textoResultado.textContent = texto;
+  resultado.style.display = 'block';
+
+  // Mensagem de sucesso
+  infoPNR.innerText = 'Texto gerado com sucesso!';
+  infoPNR.style.display = 'block';
+  infoPNR.classList.add('show');
+  infoPNR.style.background = 'linear-gradient(135deg, rgba(0, 168, 232, 0.1) 0%, rgba(0, 136, 194, 0.1) 100%)';
+  infoPNR.style.borderColor = 'rgba(0, 168, 232, 0.3)';
+  infoPNR.style.color = '#0077b6';
+  setTimeout(() => infoPNR.classList.remove('show'), 2000);
+}
+
+function copiarTexto() {
+  const texto = document.getElementById('resultText').textContent;
+  navigator.clipboard.writeText(texto).then(() => {
+    const infoPNR = document.getElementById('infoPNR');
+    infoPNR.innerText = 'Texto copiado para a área de transferência!';
+    infoPNR.style.display = 'block';
+    infoPNR.classList.add('show');
+    infoPNR.style.background = 'linear-gradient(135deg, rgba(0, 168, 232, 0.1) 0%, rgba(0, 136, 194, 0.1) 100%)';
+    infoPNR.style.borderColor = 'rgba(0, 168, 232, 0.3)';
+    infoPNR.style.color = '#0077b6';
+    setTimeout(() => infoPNR.classList.remove('show'), 2000);
+  });
+}
 </script>
 
 
