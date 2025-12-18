@@ -685,28 +685,9 @@ let originalFileName = "arquivo.xlsx";
 
 document.getElementById("fileInput").addEventListener("change", handleFile);
 
-/* ================= NAVEGAÇÃO ENTRE PÁGINAS ================= */
-function switchPage(pageName) {
-  // Remove active de todas as abas
-  document.querySelectorAll('.nav-tab').forEach(tab => {
-    tab.classList.remove('active');
-  });
+/* ================= NORMALIZAÇÃO ================= */
 
-  // Remove active de todas as páginas
-  document.querySelectorAll('.page').forEach(page => {
-    page.classList.remove('active');
-  });
-
-  // Adiciona active na aba clicada
-  event.target.classList.add('active');
-
-  // Adiciona active na página correspondente
-  document.getElementById(pageName).classList.add('active');
-}
-
-/* 🔤 REGRAS DE DESABREVIAÇÃO (APENAS 2 PRIMEIRAS PALAVRAS) */
-
-const NORMALIZATION_RULES=[
+const NORMALIZATION_RULES = [
  {regex:/^R\.?$/i,replace:"Rua"},
  {regex:/^AV\.?$/i,replace:"Avenida"},
  {regex:/^AL\.?$/i,replace:"Alameda"},
@@ -718,10 +699,10 @@ const NORMALIZATION_RULES=[
  {regex:/^BRG\.?$/i,replace:"Brigadeiro"},
  {regex:/^ALM\.?$/i,replace:"Almirante"},
  {regex:/^MAJ\.?$/i,replace:"Major"},
- {regex:/^CAP\.?$/i,replace:"Capitão"}, 
- {regex:/^SD\.?$/i,replace:"Soldado"}, 
- {regex:/^PE\.?$/i,replace:"Padre"}, 
- {regex:/^TRAV\.?$/i,replace:"Travessa"}, 
+ {regex:/^CAP\.?$/i,replace:"Capitão"},
+ {regex:/^SD\.?$/i,replace:"Soldado"},
+ {regex:/^PE\.?$/i,replace:"Padre"},
+ {regex:/^TRAV\.?$/i,replace:"Travessa"},
  {regex:/^TV\.?$/i,replace:"Travessa"},
  {regex:/^PC\.?$/i,replace:"Praça"},
  {regex:/^EST\.?$/i,replace:"Estrada"},
@@ -730,41 +711,33 @@ const NORMALIZATION_RULES=[
 ];
 
 function normalizeText(text) {
-  return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-    .toUpperCase().replace(/[^A-Z0-9 ]/g, " ")
-    .replace(/\s+/g, " ").trim();
+  return text.normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toUpperCase()
+    .replace(/[^A-Z0-9 ]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function normalizeAddress(address) {
   if (!address) return "";
-
-  // separa logradouro do restante (número/complemento)
   const parts = address.split(",");
   const streetRaw = parts[0].trim();
   const rest = parts.slice(1).join(",").trim();
 
-  // quebra o logradouro em palavras
   const words = streetRaw.split(/\s+/);
-
-  // normaliza APENAS as duas primeiras palavras
   const normalizedWords = words.map((word, index) => {
-    if (index > 1) return word; // só 0 e 1
-
+    if (index > 1) return word;
     for (const rule of NORMALIZATION_RULES) {
-      if (rule.regex.test(word)) {
-        return rule.replace;
-      }
+      if (rule.regex.test(word)) return rule.replace;
     }
     return word;
   });
 
   let result = normalizedWords.join(" ").replace(/\s+/g, " ").trim();
-
   if (rest) result += ", " + rest;
 
-  return result
-    .toLowerCase()
-    .replace(/(^|\s)\S/g, l => l.toUpperCase());
+  return result.toLowerCase().replace(/(^|\s)\S/g, l => l.toUpperCase());
 }
 
 function extractAddressParts(address) {
@@ -778,7 +751,67 @@ function extractAddressParts(address) {
 
 function normalizeCEP(cep) {
   const d = cep?.toString().replace(/\D/g, "");
-  return d && d.length === 8 ? `${d.slice(0,5)}-${d.slice(5)}` : cep || "";
+  return d && d.length === 8 ? `${d.slice(0,5)}-${d.slice(5)}` : "";
+}
+
+/* ================= SEMÂNTICA DE LOGRADOURO ================= */
+
+function levenshteinDistance(a, b) {
+  if (Math.abs(a.length - b.length) > 2) return 99;
+  const dp = Array.from({ length: a.length + 1 }, () =>
+    Array(b.length + 1).fill(0)
+  );
+  for (let i = 0; i <= a.length; i++) dp[i][0] = i;
+  for (let j = 0; j <= b.length; j++) dp[0][j] = j;
+
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      dp[i][j] = Math.min(
+        dp[i - 1][j] + 1,
+        dp[i][j - 1] + 1,
+        dp[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)
+      );
+    }
+  }
+  return dp[a.length][b.length];
+}
+
+function areStreetsSemanticallyEquivalent(a, b) {
+  const aw = normalizeText(a).split(" ");
+  const bw = normalizeText(b).split(" ");
+
+  const af = aw.filter(w => w.length > 1);
+  const bf = bw.filter(w => w.length > 1);
+  if (af.join(" ") === bf.join(" ")) return true;
+
+  const expand = (shorts, fulls) =>
+    shorts.map(w => {
+      if (w.length > 1) return w;
+      const f = fulls.find(x => x.startsWith(w));
+      return f || w;
+    });
+
+  const ae = expand(aw, bw).join(" ");
+  const be = expand(bw, aw).join(" ");
+  if (ae === be) return true;
+
+  return levenshteinDistance(ae, be) <= 2;
+}
+
+/* ================= PRIORIDADE PARA ENDEREÇO COMPLETO ================= */
+
+function countAbbreviations(street) {
+  return normalizeText(street)
+    .split(" ")
+    .filter(w => w.length === 1).length;
+}
+
+function isMoreCompleteStreet(newStreet, oldStreet) {
+  const newAbbr = countAbbreviations(newStreet);
+  const oldAbbr = countAbbreviations(oldStreet);
+
+  if (newAbbr !== oldAbbr) return newAbbr < oldAbbr;
+  return newStreet.length > oldStreet.length;
 }
 
 /* ================= PROCESSAMENTO ================= */
@@ -801,42 +834,57 @@ function handleFile(event) {
   loadingBar.style.width = "100%";
 
   const reader = new FileReader();
-
   reader.onload = function(e) {
-    const data = new Uint8Array(e.target.result);
-    const wb = XLSX.read(data, { type: "array" });
-    const sheet = wb.Sheets[wb.SheetNames[0]];
-    const rows = XLSX.utils.sheet_to_json(sheet);
-
+    const wb = XLSX.read(new Uint8Array(e.target.result), { type: "array" });
+    const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
     const grouped = {};
 
     rows.forEach(r => {
       const full = normalizeAddress(r["Destination Address"] || "");
       const { street, number, complement } = extractAddressParts(full);
 
-      const bairro = (r["Bairro"] || "").toString().trim();
-      const city = (r["City"] || "").toString().trim();
-      const zip = normalizeCEP(r["Zipcode/Postal code"] || "");
-      const sequence = r["Sequence"];
+      const bairro = (r["Bairro"] || "").trim();
+      const city = (r["City"] || "").trim();
+      const zip = normalizeCEP(r["Zipcode/Postal code"]);
+      const seq = r["Sequence"];
 
-      const key = [
-        normalizeText(street),
-        number,
-        normalizeText(city),
-        zip
-      ].join("|");
+      let matchedKey = null;
 
-      grouped[key] ??= {
-        addr: number ? `${street}, ${number}` : street,
-        comp: complement,
-        bairro,
-        city,
-        seq: new Set()
-      };
-
-      if (sequence !== undefined && sequence !== null) {
-        grouped[key].seq.add(sequence);
+      for (const k in grouped) {
+        const g = grouped[k];
+        if (
+          g.number === number &&
+          g.zip === zip &&
+          normalizeText(g.city) === normalizeText(city) &&
+          areStreetsSemanticallyEquivalent(g.streetNorm, street)
+        ) {
+          matchedKey = k;
+          break;
+        }
       }
+
+      const key = matchedKey ?? `${normalizeText(street)}|${number}|${normalizeText(city)}|${zip}`;
+
+      if (!grouped[key]) {
+        grouped[key] = {
+          addr: number ? `${street}, ${number}` : street,
+          comp: complement,
+          bairro,
+          city,
+          zip,
+          number,
+          streetNorm: street,
+          seq: new Set()
+        };
+      } else {
+        // 🔹 REGRA FINAL: mantém o endereço mais completo
+        if (isMoreCompleteStreet(street, grouped[key].streetNorm)) {
+          grouped[key].addr = number ? `${street}, ${number}` : street;
+          grouped[key].streetNorm = street;
+        }
+      }
+
+      if (seq != null) grouped[key].seq.add(seq);
     });
 
     const out = Object.values(grouped).map(g => ({
@@ -870,67 +918,8 @@ function handleFile(event) {
 function downloadFile() {
   XLSX.writeFile(outputWorkbook, `MelhorRota_${originalFileName}`);
 }
-
-/* ================= FUNÇÕES PNR ================= */
-
-function gerarTextoPNR() {
-  const nome = document.getElementById('nomeInput').value.trim();
-  const codigo = document.getElementById('codigoInput').value.trim();
-  const resultado = document.getElementById('pnrResult');
-  const textoResultado = document.getElementById('resultText');
-  const infoPNR = document.getElementById('infoPNR');
-
-  // Validação
-  if (!nome || !codigo) {
-    infoPNR.innerText = '⚠️ Por favor, preencha todos os campos!';
-    infoPNR.style.display = 'block';
-    infoPNR.classList.add('show');
-    infoPNR.style.background = 'linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 152, 0, 0.1) 100%)';
-    infoPNR.style.borderColor = 'rgba(255, 193, 7, 0.3)';
-    infoPNR.style.color = '#f57c00';
-    setTimeout(() => infoPNR.classList.remove('show'), 3000);
-    return;
-  }
-
-  // Gerar texto
-  const texto = `Olá!
-Me chamo ${nome}, sou entregador da Shopee
-Gostaria de confirmar se a entrega do seu pedido ${codigo} ocorreu como esperado
-Você poderia confirmar se o pacote foi realmente recebido, por favor?
-
-Envie 1: Se já recebeu o seu pedido
-Envie 2: Se recebeu com alguma divergência e qual seria?
-Envie 3: Não recebido
-
-Obrigado pela resposta.`;
-
-  textoResultado.textContent = texto;
-  resultado.style.display = 'block';
-
-  // Mensagem de sucesso
-  infoPNR.innerText = 'Texto gerado com sucesso!';
-  infoPNR.style.display = 'block';
-  infoPNR.classList.add('show');
-  infoPNR.style.background = 'linear-gradient(135deg, rgba(0, 168, 232, 0.1) 0%, rgba(0, 136, 194, 0.1) 100%)';
-  infoPNR.style.borderColor = 'rgba(0, 168, 232, 0.3)';
-  infoPNR.style.color = '#0077b6';
-  setTimeout(() => infoPNR.classList.remove('show'), 2000);
-}
-
-function copiarTexto() {
-  const texto = document.getElementById('resultText').textContent;
-  navigator.clipboard.writeText(texto).then(() => {
-    const infoPNR = document.getElementById('infoPNR');
-    infoPNR.innerText = 'Texto copiado para a área de transferência!';
-    infoPNR.style.display = 'block';
-    infoPNR.classList.add('show');
-    infoPNR.style.background = 'linear-gradient(135deg, rgba(0, 168, 232, 0.1) 0%, rgba(0, 136, 194, 0.1) 100%)';
-    infoPNR.style.borderColor = 'rgba(0, 168, 232, 0.3)';
-    infoPNR.style.color = '#0077b6';
-    setTimeout(() => infoPNR.classList.remove('show'), 2000);
-  });
-}
 </script>
+
 
 </body>
 </html>
