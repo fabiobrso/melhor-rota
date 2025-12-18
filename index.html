@@ -685,9 +685,17 @@ let originalFileName = "arquivo.xlsx";
 
 document.getElementById("fileInput").addEventListener("change", handleFile);
 
+/* ================= NAVEGAÇÃO ENTRE PÁGINAS ================= */
+function switchPage(pageName) {
+  document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById(pageName).classList.add('active');
+}
+
 /* ================= NORMALIZAÇÃO ================= */
 
-const NORMALIZATION_RULES = [
+const NORMALIZATION_RULES=[
  {regex:/^R\.?$/i,replace:"Rua"},
  {regex:/^AV\.?$/i,replace:"Avenida"},
  {regex:/^AL\.?$/i,replace:"Alameda"},
@@ -699,10 +707,10 @@ const NORMALIZATION_RULES = [
  {regex:/^BRG\.?$/i,replace:"Brigadeiro"},
  {regex:/^ALM\.?$/i,replace:"Almirante"},
  {regex:/^MAJ\.?$/i,replace:"Major"},
- {regex:/^CAP\.?$/i,replace:"Capitão"},
- {regex:/^SD\.?$/i,replace:"Soldado"},
- {regex:/^PE\.?$/i,replace:"Padre"},
- {regex:/^TRAV\.?$/i,replace:"Travessa"},
+ {regex:/^CAP\.?$/i,replace:"Capitão"}, 
+ {regex:/^SD\.?$/i,replace:"Soldado"}, 
+ {regex:/^PE\.?$/i,replace:"Padre"}, 
+ {regex:/^TRAV\.?$/i,replace:"Travessa"}, 
  {regex:/^TV\.?$/i,replace:"Travessa"},
  {regex:/^PC\.?$/i,replace:"Praça"},
  {regex:/^EST\.?$/i,replace:"Estrada"},
