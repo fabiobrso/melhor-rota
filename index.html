@@ -713,9 +713,40 @@ const NORMALIZATION_RULES=[
  {regex:/^TRAV\.?$/i,replace:"Travessa"}, 
  {regex:/^TV\.?$/i,replace:"Travessa"},
  {regex:/^PC\.?$/i,replace:"Praça"},
+ {regex:/^PÇ\.?$/i,replace:"Praça"},
  {regex:/^EST\.?$/i,replace:"Estrada"},
  {regex:/^VL\.?$/i,replace:"Vila"},
- {regex:/^VSC\.?$/i,replace:"Visconde"}
+ {regex:/^VSC\.?$/i,replace:"Visconde"},
+ {regex:/^S\.?$/i,replace:"São"},
+ {regex:/^LRG\.?$/i,replace:"Largo"},
+ {regex:/^SEN\.?$/i,replace:"Senador"},
+ {regex:/^TEN\.?$/i,replace:"Tenente"},
+ 
+ {regex:/^R.\.?$/i,replace:"Rua"},
+ {regex:/^AV.\.?$/i,replace:"Avenida"},
+ {regex:/^AL.\.?$/i,replace:"Alameda"},
+ {regex:/^DR.\.?$/i,replace:"Doutor"},
+ {regex:/^CEL.\.?$/i,replace:"Coronel"},
+ {regex:/^STO.\.?$/i,replace:"Santo"},
+ {regex:/^STA.\.?$/i,replace:"Santa"},
+ {regex:/^ROD.\.?$/i,replace:"Rodovia"},
+ {regex:/^BRG.\.?$/i,replace:"Brigadeiro"},
+ {regex:/^ALM.\.?$/i,replace:"Almirante"},
+ {regex:/^MAJ.\.?$/i,replace:"Major"},
+ {regex:/^CAP.\.?$/i,replace:"Capitão"}, 
+ {regex:/^SD.\.?$/i,replace:"Soldado"}, 
+ {regex:/^PE.\.?$/i,replace:"Padre"}, 
+ {regex:/^TRAV.\.?$/i,replace:"Travessa"}, 
+ {regex:/^TV.\.?$/i,replace:"Travessa"},
+ {regex:/^PC.\.?$/i,replace:"Praça"},
+ {regex:/^PÇ.\.?$/i,replace:"Praça"},
+ {regex:/^EST.\.?$/i,replace:"Estrada"},
+ {regex:/^VL.\.?$/i,replace:"Vila"},
+ {regex:/^VSC.\.?$/i,replace:"Visconde"},
+ {regex:/^S.\.?$/i,replace:"São"},
+ {regex:/^LRG.\.?$/i,replace:"Largo"},
+ {regex:/^SEN.\.?$/i,replace:"Senador"},
+ {regex:/^TEN.\.?$/i,replace:"Tenente"}
 ];
 
 function normalizeText(text) {
@@ -916,7 +947,7 @@ function handleFile(event) {
       info.innerText = `Planilha organizada! (${out.length} paradas)`;
       info.style.display = "block";
       info.classList.add("show");
-      setTimeout(() => info.classList.remove("show"), 2000);
+      setTimeout(() => info.classList.remove("show"), 90000);
     }, 1000);
   };
 
